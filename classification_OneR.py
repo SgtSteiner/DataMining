@@ -16,12 +16,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 
 
-def train_feature_value(x, y_true, feature, value):
+def train_feature_value(X, y_true, feature, value):
     # Crea un diccionario para contar con qué frecuencia se dan determinadas predicciones
     class_counts = defaultdict(int)
 
     # Se itera a través de cada muestra y se cuenta la frecuencia de cada par clase/valor
-    for sample, y in zip(x, y_true):
+    for sample, y in zip(X, y_true):
         if sample[feature] == value:
             class_counts[y] += 1
 
@@ -36,13 +36,13 @@ def train_feature_value(x, y_true, feature, value):
     return most_frequent_class, error
 
 
-def train_on_feature(x, y_true, feature):
+def train_on_feature(X, y_true, feature):
     """
     Computes the predictors and error for a given feature using the OneR algorithm
 
     Parameters
     ----------
-    x: array [n_samples, n_features]
+    X: array [n_samples, n_features]
         The two dimensional array that holds the dataset. Each row is a sample, each column
         is a feature.
 
@@ -63,13 +63,13 @@ def train_on_feature(x, y_true, feature):
         The ratio of training data that this rule incorrectly predicts.
     """
     # Obtiene todos los valores únicos que tiene esta variable
-    values = set(x[:, feature])
+    values = set(X[:, feature])
     # Almacena la matriz de predictores que se devuelve
     predictors = {}
     errors = []
 
     for current_value in values:
-        most_frequent_class, error = train_feature_value(x, y_true, feature, current_value)
+        most_frequent_class, error = train_feature_value(X, y_true, feature, current_value)
         predictors[current_value] = most_frequent_class
         errors.append(error)
 
@@ -88,23 +88,23 @@ def predict(x_test, model):
 if __name__ == "__main__":
     # Cargamos nuestro dataset
     dataset = load_iris()
-    x = dataset.data
+    X = dataset.data
     y = dataset.target
-    n_samples, n_features = x.shape
+    n_samples, n_features = X.shape
 
     # Comenzamos el proceso de discretización
     # Calculamos la media de cada característica (4), siendo el primer elemento de la lista la media
     # de la primera características y así sucesivamente.
-    attribute_means = x.mean(axis=0)
+    attribute_means = X.mean(axis=0)
     # Transformamos nuestro dataset de características continuas a características categóricas discretas
-    x_d = np.array(x >= attribute_means, dtype='int')
+    X_d = np.array(X >= attribute_means, dtype='int')
 
     # Para evitar el sobreajuste, y no usar el dataset de prueba para el entrenamiento,
     # dividimos el dataset en dos datasets más pequeños (aprox. un 14% del total)
-    x_train, x_test, y_train, y_test = train_test_split(x_d, y, random_state=14)
+    X_train, X_test, y_train, y_test = train_test_split(X_d, y, random_state=14)
 
     # Se procesan todos los predictores
-    all_predictors = {variable: train_on_feature(x_train, y_train, variable) for variable in range(x_train.shape[1])}
+    all_predictors = {variable: train_on_feature(X_train, y_train, variable) for variable in range(X_train.shape[1])}
     errors = {variable: error for variable, (mapping, error) in all_predictors.items()}
 
     # Se elige el mejor y se guarda como "model", ordenado por error
@@ -115,7 +115,7 @@ if __name__ == "__main__":
     model = {'variable': best_variable, 'predictor': all_predictors[best_variable][0]}
     print(model)
 
-    y_predicted = predict(x_test, model)
+    y_predicted = predict(X_test, model)
     print(y_predicted)
 
     # Se calcula la precisión tomando la media de las cantidades que cumple que y_predicted es igual a y_test

@@ -25,7 +25,7 @@ plt.plot(x, y)
 plt.plot(x, z)
 plt.show()
 
-data1 = np.loadtxt('datasets\\scipy.txt')  # load the file
+data1 = np.loadtxt('data\\scipy.txt')  # load the file
 for val in data1.T:  # loop over each and every value in data1.T
     plt.plot(data1[:, 0], val)  # data1[:,0] is the first row in data1.T
 plt.show()

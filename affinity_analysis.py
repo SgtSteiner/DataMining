@@ -17,7 +17,7 @@ if __name__ == "__main__":
     features = ["pan", "leche", "queso", "manzanas", "plátanos"]
 
     # Cargamos el dataset con las muestras de compras realizadas de las diferentes features
-    dataset_filename = "datasets\\affinity_dataset.txt"
+    dataset_filename = "data\\affinity_dataset.txt"
     x = np.loadtxt(dataset_filename)
     n_samples, n_features = x.shape
     print("Este dataset contiene {0} muestras y {1} features".format(n_samples, n_features))
