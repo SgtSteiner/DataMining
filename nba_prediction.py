@@ -5,6 +5,8 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import GridSearchCV
 
 
 if __name__ == "__main__":
@@ -99,3 +101,28 @@ if __name__ == "__main__":
 
     scores = cross_val_score(clf, X_teams, y_true, scoring="accuracy")
     print("Accuracy X_teams: {0:.1f}%".format(np.mean(scores) * 100))
+
+    # Aplicando random forests
+    clf = RandomForestClassifier(random_state=14)
+    scores = cross_val_score(clf, X_teams, y_true, scoring="accuracy")
+    print("Accuracy X_teams random forests: {0:.1f}%".format(np.mean(scores) * 100))
+
+    # Añadimos más características para comprobar su rendimiento
+    X_all = np.hstack([X_lastwinner, X_teams])
+    clf = RandomForestClassifier(random_state=14)
+    scores = cross_val_score(clf, X_all, y_true, scoring="accuracy")
+    print("Accuracy X_teams random forests: {0:.1f}%".format(np.mean(scores) * 100))
+
+
+    # Uso de GridSearchCV
+    parameter_space = {
+        "max_features": [2, 10, "auto"],
+        "n_estimators": [100, 200],
+        "criterion": ["gini", "entropy"],
+        "min_samples_leaf": [2, 4, 6],
+    }
+    clf = RandomForestClassifier(random_state=14)
+    grid = GridSearchCV(clf, parameter_space)
+    grid.fit(X_all, y_true)
+    print("Accuracy GridSearchCV random forests: {0:.1f}%".format(grid.best_score_ * 100))
+    print(grid.best_estimator_)
