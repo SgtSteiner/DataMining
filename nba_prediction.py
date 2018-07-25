@@ -1,6 +1,8 @@
 from collections import defaultdict
 import pandas as pd
 import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 from sklearn.tree import DecisionTreeClassifier, export_graphviz
 from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import LabelEncoder
@@ -34,6 +36,10 @@ if __name__ == "__main__":
     y_true = dataset["HomeWin"].values
 
     print("El porcentaje de veces que gana el equipo local es {0:.2f}%".format(dataset["HomeWin"].mean() * 100))
+
+    print(dataset.groupby("HomeWin").size())
+    sns.catplot('HomeWin', data=dataset, kind="count")
+    plt.show()
 
     # Añadimos dos nuevas características para indicar si el equipo local y el visitante ganaron su último partido
     won_last = defaultdict(int)
