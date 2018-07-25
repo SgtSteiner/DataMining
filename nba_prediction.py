@@ -1,12 +1,24 @@
 from collections import defaultdict
 import pandas as pd
 import numpy as np
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeClassifier, export_graphviz
 from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
+
+
+def export_tree(filename, decision_tree, feature_names=None, class_names=None):
+    with open(filename, "w") as f_out:
+        f_out = export_graphviz(decision_tree,
+                                out_file=f_out,
+                                max_depth=7,
+                                impurity=True,
+                                feature_names=feature_names,
+                                class_names=class_names,
+                                rounded=True,
+                                filled=True,)
 
 
 if __name__ == "__main__":
@@ -17,7 +29,7 @@ if __name__ == "__main__":
     dataset.columns = ["Date", "Start (ET)", "Visitor Team", "VisitorPTS",
                        "Home Team", "HomePTS", "OT?", "Score Type", "Attend.", "Notes"]
 
-    # Añadimos una nueva característica para indicar si ganó el equipo local
+    # Añadimos una nueva característica para indicar si ganó el equipo local y creamos el dataset con la clase (y)
     dataset["HomeWin"] = dataset["HomePTS"] > dataset["VisitorPTS"]
     y_true = dataset["HomeWin"].values
 
@@ -42,10 +54,17 @@ if __name__ == "__main__":
 
     # Creamos el árbol de decisión
     clf = DecisionTreeClassifier(random_state=14)
-    X_previouswins = dataset[["HomeLastWin", "VisitorLastWin"]].values
+    X_previouswins = dataset[["HomeLastWin", "VisitorLastWin"]]
 
     scores = cross_val_score(clf, X_previouswins, y_true, scoring="accuracy")
     print("Accuracy X_previouswin: {0:.1f}%".format(np.mean(scores) * 100))
+
+    # Dibujamos el árbol
+    clf = clf.fit(X_previouswins, y_true)
+    export_tree("tree1.dot",
+                clf,
+                feature_names=X_previouswins.columns,
+                class_names=["Lost", "Won"])
 
     # Creamos el dataset de clasificaciones de la NBA
     standings_filename = "data\\standings.csv"
