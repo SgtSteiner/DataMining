@@ -21,6 +21,7 @@ def export_tree(filename, decision_tree, feature_names=None, class_names=None):
                                 class_names=class_names,
                                 rounded=True,
                                 filled=True,)
+    return f_out
 
 
 if __name__ == "__main__":
@@ -67,10 +68,10 @@ if __name__ == "__main__":
 
     # Dibujamos el árbol
     clf = clf.fit(X_previouswins, y_true)
-    export_tree("tree1.dot",
-                clf,
-                feature_names=X_previouswins.columns,
-                class_names=["Lost", "Won"])
+    fout = export_tree("tree1.dot",
+                       clf,
+                       feature_names=X_previouswins.columns,
+                       class_names=["Lost", "Won"])
 
     # Creamos el dataset de clasificaciones de la NBA
     standings_filename = "data\\standings.csv"
@@ -137,7 +138,6 @@ if __name__ == "__main__":
     clf = RandomForestClassifier(random_state=14)
     scores = cross_val_score(clf, X_all, y_true, scoring="accuracy")
     print("Accuracy X_teams random forests: {0:.1f}%".format(np.mean(scores) * 100))
-
 
     # Uso de GridSearchCV
     parameter_space = {
